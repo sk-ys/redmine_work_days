@@ -4,11 +4,21 @@ require 'redmine'
 require 'redmine_utils_patch'
 require 'redmine_work_days/hooks'
 
-ActionDispatch::Callbacks.to_prepare do
+def reloader_to_prepare
   require_dependency 'redmine/utils'
 
   unless Redmine::Utils::DateCalculation.included_modules.include?(RedmineUtilsDateCalculationPatch)
     Redmine::Utils::DateCalculation.send :include, RedmineUtilsDateCalculationPatch
+  end
+end
+
+if Rails::VERSION::MAJOR >= 5 and Rails::VERSION::MINOR >= 1
+  ActiveSupport::Reloader.to_prepare do
+    reloader_to_prepare
+  end
+else
+  ActionDispatch::Callbacks.to_prepare do
+    reloader_to_prepare
   end
 end
 

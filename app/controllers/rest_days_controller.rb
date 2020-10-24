@@ -1,6 +1,6 @@
 class RestDaysController < ApplicationController
-  before_filter :require_admin
-  before_filter :get_year
+  before_action :require_admin
+  before_action :get_year
 
   unloadable
 
@@ -13,7 +13,12 @@ class RestDaysController < ApplicationController
   end
 
   def create
-    @rest_day = RestDay.new(params[:rest_day])
+    if Rails::VERSION::MAJOR < 4
+      params_permitted = params[:rest_day]
+    else
+      params_permitted = params.require(:rest_day).permit([:day, :description])
+    end
+    @rest_day = RestDay.new(params_permitted)
     if @rest_day.save
       RestDay.clear!
       redirect_to rest_days_path, :notice => l(:notice_create_rest_day_success)
@@ -23,7 +28,12 @@ class RestDaysController < ApplicationController
   end
 
   def import
-    @rest_day_csv = RestDayCsv.new(params[:rest_day_csv])
+    if Rails::VERSION::MAJOR < 4
+      params_permitted = params[:rest_day_csv]
+    else
+      params_permitted = params.require(:rest_day_csv).permit([:file])
+    end
+    @rest_day_csv = RestDayCsv.new(params_permitted)
 
     if @rest_day_csv.valid?
       begin
@@ -44,7 +54,12 @@ class RestDaysController < ApplicationController
   end
 
   def range_delete
-    @rest_day_range = RestDayRange.new(params[:rest_day_range])
+    if Rails::VERSION::MAJOR < 4
+      params_permitted = params[:rest_day_range]
+    else
+      params_permitted = params.require(:rest_day_range).permit([:from, :to])
+    end
+    @rest_day_range = RestDayRange.new(params_permitted)
 
     if @rest_day_range.valid?
       @rest_days = RestDay.between(@rest_day_range.from, @rest_day_range.to)

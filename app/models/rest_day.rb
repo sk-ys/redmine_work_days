@@ -1,7 +1,9 @@
 class RestDay < ActiveRecord::Base
   unloadable
   
-  attr_accessible :day, :description
+  if Rails::VERSION::MAJOR < 4
+    attr_accessible :day, :description
+  end
 
   default_scope { order("#{RestDay.table_name}.day ASC") }
   

@@ -1,4 +1,4 @@
-class CreateRestDays < ActiveRecord::Migration
+class CreateRestDays < ActiveRecord::Migration[4.2]
   def change
     create_table :rest_days do |t|
       t.date :day
